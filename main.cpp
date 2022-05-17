@@ -1,7 +1,7 @@
 #include <iostream>
 #include "Graph.h"
-
-int main() {
+#include "Simulation.h"
+int main(int argc, char *argv[]) {
     Graph g;
     g.addEdge("from1", "to1", bus, intercity, 5);
     g.addEdge("from1", "to1", sprinter, stad, 5);
@@ -26,6 +26,8 @@ int main() {
 
     cout << g;
 //    copy(v.begin(), v.end(), ostream_iterator<string>(cout, " "));
+
+
 
     return 0;
 }

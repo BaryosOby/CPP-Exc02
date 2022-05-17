@@ -7,7 +7,8 @@
 #include <memory>
 #include <queue>
 #include <iterator>
-
+#include <exception>
+#include <sstream>
 using namespace std;
 
 enum VehicleTypes {bus, tram, sprinter, rail};
