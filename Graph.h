@@ -1,13 +1,14 @@
 #ifndef EXC02_GRAPH_H
 #define EXC02_GRAPH_H
 #include "Edge.h"
+#define TEST
 
 class Graph {
 private:
     map< string, vector< vector< shared_ptr<Edge> > > > graph;
     map<pair<string, VehicleTypes>, vector< shared_ptr<Edge> >> alter;
 
-    void initVertices(const string &from, VehicleTypes vType, StationTypes sType);
+    void initVertices(const string &from, StationTypes sType);
 
 public:
     Graph() = default;
@@ -25,7 +26,9 @@ public:
     void addVertex(const string& name, VehicleTypes vt);
 
     vector<string> BFSbyType(const string& from, VehicleTypes vType) const;
+    vector<string> BFSAlter(const string& from, VehicleTypes vType) const;
     int DijByType(const string& from, const string& to, VehicleTypes vType) const;
+    int DijAlter(const string& from, const string& to, VehicleTypes vType) const;
     int Dij(const string& from, const string& to) const;
     int belFord(const string& from, const string& to);
 

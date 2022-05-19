@@ -6,7 +6,7 @@ void Simulation::load(const string &input) {
 
 void Simulation::inOutbound(const string &from, const Graph &gr, const string &message) const {
     for (int t = bus; t != rail; t++) {
-        auto v = g.BFSbyType(from, static_cast <VehicleTypes>(t));
+        auto v = gr.BFSAlter(from, static_cast <VehicleTypes>(t));
         cout << v_types_strings[t] << ": ";
         if (v.empty()) {
             cout << message << endl;
@@ -19,7 +19,7 @@ void Simulation::inOutbound(const string &from, const Graph &gr, const string &m
 
 void Simulation::shortestByCar(const string &from, const string &to) const {
     for (int t = bus; t != rail; t++) {
-        int v = g.DijByType(from, to, static_cast <VehicleTypes>(t));
+        int v = g.DijAlter(from, to, static_cast <VehicleTypes>(t));
         cout << v_types_strings[t] << ": ";
         if (v < RAND_MAX) {
             cout << v << endl;
@@ -29,8 +29,8 @@ void Simulation::shortestByCar(const string &from, const string &to) const {
     }
 }
 
-void Simulation::shortest(const string &from, const string &to) const {
-    int v = g.Dij(from, to);
+void Simulation::shortest(const string &from, const string &to){
+    int v = g.belFord(from, to);
     if (v < RAND_MAX) {
         cout << "shortest time from " << from << " to " << to << ": " << v << endl;
     } else {

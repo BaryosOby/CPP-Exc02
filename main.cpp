@@ -9,9 +9,9 @@ int main(int argc, char *argv[]) {
     g.addEdgeAlter("B", "C", bus, stad, central,10);
     g.addEdgeAlter("B", "C", tram, stad, central,20);
     g.addEdgeAlter("B", "D", rail, stad, intercity,1);
-    g.addEdgeAlter("C", "D", bus, central, intercity,100);
-    g.addEdgeAlter("C", "D", tram, central, intercity,100);
-//    g.addEdge("to1", "to4", bus, intercity, 3);
+    g.addEdgeAlter("C", "D", bus, central, intercity,20);
+    g.addEdgeAlter("C", "D", tram, central, intercity,20);
+//    g.addEdgeAlter("A", "B", rail, intercity, stad, 30);
 //    g.addEdge("to1", "to4", rail, central, 3);
 //    g.addEdge("to4", "to2", bus, intercity, 5);
 //    g.addEdge("to4", "to5", sprinter, stad, 5);
@@ -22,14 +22,14 @@ int main(int argc, char *argv[]) {
 //    g.addEdge("to2", "to5", rail, intercity, 2);
 //    g.addEdge("from1", "to6", rail, stad, 2);
 
-    cout << g.belFord("A", "D");
+//    cout << g.belFord("A", "D");
 
-//    auto v = g.BFSbyType("from1", bus);
+//    auto v = g.BFSAlter("A", bus);
 //    for(auto i: v){
-//        cout << i << ": " << g.Dij("from1", i)<< endl;
+//        cout << i << ": " << g.DijAlter("A", i, bus)<< endl;
 //    }
 
-//    cout << g;
+    cout << g.DijAlter("A", "C", rail)<< endl;
 //    copy(v.begin(), v.end(), ostream_iterator<string>(cout, " "));
 
 

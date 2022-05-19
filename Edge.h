@@ -9,6 +9,7 @@
 #include <iterator>
 #include <exception>
 #include <sstream>
+#include <limits>
 using namespace std;
 
 enum VehicleTypes {bus, tram, sprinter, rail};
@@ -16,6 +17,7 @@ enum StationTypes {intercity, central, stad};
 
 static string v_types_strings[] {"bus", "tram", "sprinter", "rail"};
 static string s_types_strings[] {"intercity", "central", "stad"};
+static int inf = numeric_limits<int>::max() / 2;
 
 struct Times{
     map<StationTypes, int> transitTimes;

@@ -41,7 +41,7 @@ private:
 
     void shortestByCar(const string &from, const string &to) const;
 
-    void shortest(const string &from, const string &to) const;
+    void shortest(const string &from, const string &to);
 
     void print() const;
 
