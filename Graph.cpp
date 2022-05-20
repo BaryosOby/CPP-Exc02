@@ -1,5 +1,4 @@
 #include "Graph.h"
-
 #include <memory>
 
 Graph::Graph(Graph &&rhs) noexcept : graph(move(rhs.graph)) {
@@ -159,7 +158,7 @@ int Graph::DijAlter(const string &from, const string &to, VehicleTypes vType) co
             }
         }
     }
-    //TODO if inf return message?
+    if(discovered[to] >= inf){return inf; }
     return discovered[to] - times.stopTimes[vType];
 }
 
@@ -298,17 +297,23 @@ int Graph::belFord(const string &from, const string &to) {
 
 ostream &operator<<(ostream &out, const Graph& g) {
     out << "Neverland's roadmap:" << endl;
-    for(const auto& v : g.graph){
-        out << "from " << v.first << " to:" <<endl;
-        for(int i = 0; i < 3; i++){
-            auto curr = v.second[i];
-            for(const auto& e: curr){
-                out << *e;
+    for(const auto& v : g.alter){
+        string from = v.first.first;
+        if(v.second.size() > 3){
+            out << "from " << from << " by "<< v_types_strings[v.first.second] <<" to:" <<endl;
+            for(const auto& e: v.second){
+                if(e->getDest() != from){
+                    out << e->getDest() << " | ";
+                }
             }
+            out << "\n\n";
         }
-        out << endl;
     }
     return out;
+}
+
+bool Graph::findVertex(const string &vName) const {
+    return alter.find(make_pair(vName,bus)) != alter.end();
 }
 
 

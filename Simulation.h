@@ -8,7 +8,20 @@ class Simulation {
 private:
     Graph g;
     Graph g_t; //g.transpose
-    // std::ostream output;
+    string output;
+
+    string tempFrom;
+    string tempTo;
+    int tempDriveTime;
+
+    class SimulationException{
+        string error;
+    public:
+        explicit SimulationException(string& err): error(err){}
+        void what(){
+            cerr << error << endl;
+        }
+    };
 
     const string outMessage = "no outbound travel";
     const string inMessage = "no inbound travel";
@@ -47,13 +60,17 @@ private:
 
     bool validInput(const string &input);        //TODO throw exceptions
 
-    bool validConfiguration(string &conf);
+    void validConfiguration(string &conf);
 
     bool validOutput(const string &output); // not sure what to do here
 
     int validFileName(const string &file); //added to check legal file name for vehicle info
 
+    void validFile(const string& fileName, fstream& file);
+
     bool validChoice(const string &input);
+
+    void getInput(fstream& file, VehicleTypes vType);
 
     void addEdge(const string& data,VehicleTypes vehicle); //adding edge from this class after validation as well to g_t
 
@@ -62,7 +79,7 @@ private:
 
 
 public:
-    //Simulation(const string &input, const string &conf = "", const string &output = "");
+    Simulation(int argc, char** argv);
 
     // TODO big 5
     void run();

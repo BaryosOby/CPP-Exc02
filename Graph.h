@@ -1,7 +1,7 @@
 #ifndef EXC02_GRAPH_H
 #define EXC02_GRAPH_H
 #include "Edge.h"
-#define TEST
+//#define TEST
 
 class Graph {
 private:
@@ -31,6 +31,8 @@ public:
     int DijAlter(const string& from, const string& to, VehicleTypes vType) const;
     int Dij(const string& from, const string& to) const;
     int belFord(const string& from, const string& to);
+
+    bool findVertex(const string& vName) const;
 
     friend ostream& operator<<(ostream& out, const Graph& g);
 };

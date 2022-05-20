@@ -10,6 +10,7 @@
 #include <exception>
 #include <sstream>
 #include <limits>
+
 using namespace std;
 
 enum VehicleTypes {bus, tram, sprinter, rail};

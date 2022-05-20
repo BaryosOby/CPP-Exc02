@@ -1,15 +1,15 @@
 #include "Simulation.h"
 
-void Simulation::load(const string &input) {
-
-}
+//void Simulation::load(const string &input) {
+//
+//}
 
 void Simulation::inOutbound(const string &from, const Graph &gr, const string &message) const {
-    for (int t = bus; t != rail; t++) {
+    for (int t = 0; t < 4; t++) {
         auto v = gr.BFSAlter(from, static_cast <VehicleTypes>(t));
         cout << v_types_strings[t] << ": ";
         if (v.empty()) {
-            cout << message << endl;
+            cout << message;
         }
         copy(v.begin(), v.end(), ostream_iterator<string>(cout, " "));
         cout << endl;
@@ -18,10 +18,10 @@ void Simulation::inOutbound(const string &from, const Graph &gr, const string &m
 
 
 void Simulation::shortestByCar(const string &from, const string &to) const {
-    for (int t = bus; t != rail; t++) {
+    for (int t = 0; t < 4; t++) {
         int v = g.DijAlter(from, to, static_cast <VehicleTypes>(t));
         cout << v_types_strings[t] << ": ";
-        if (v < RAND_MAX) {
+        if (v < inf) {
             cout << v << endl;
         } else {
             cout << "route unavailable" << endl;
@@ -31,7 +31,7 @@ void Simulation::shortestByCar(const string &from, const string &to) const {
 
 void Simulation::shortest(const string &from, const string &to){
     int v = g.belFord(from, to);
-    if (v < RAND_MAX) {
+    if (v < inf) {
         cout << "shortest time from " << from << " to " << to << ": " << v << endl;
     } else {
         cout << "route unavailable" << endl;
@@ -39,9 +39,13 @@ void Simulation::shortest(const string &from, const string &to){
 }
 
 void Simulation::print() const {
-
+    ofstream out;
+    out.open(output);
+    out << g;
+    out.close();
 }
 
+// validate input file content
 bool Simulation::validInput(const string &input) {
     int spaceCounter = 0;
     string line = input, cityOrDriveTime;
@@ -52,9 +56,16 @@ bool Simulation::validInput(const string &input) {
         if (line[i] == ' ' || line[i] == '\t') {
             if (cityOrDriveTime.size() > 32) throw runtime_error("City name to long!\n");
             spaceCounter++;
-            if (spaceCounter > 2) break; // means its a number
+            if(spaceCounter == 1){
+                tempFrom = cityOrDriveTime;
+            }
+            else if(spaceCounter == 2){
+                tempTo = cityOrDriveTime;
+            }
+            else break; // means its a number
             cityOrDriveTime = "";
-        } else {
+        }
+        else {
             cityOrDriveTime += line[i];
         }
     }
@@ -62,10 +73,11 @@ bool Simulation::validInput(const string &input) {
     toNum >> driveTime;
     toNum.clear();
     if (driveTime < 0) throw runtime_error("Negative drive time error!\n");
+    tempDriveTime = driveTime;
     return true;
 }
 
-bool Simulation::validConfiguration(string &conf) {
+void Simulation::validConfiguration(string &conf) {
     string line, typeOrTime;
     stringstream toNum;
     int time, spaceCounter = 0;
@@ -102,16 +114,13 @@ bool Simulation::validConfiguration(string &conf) {
     //changing configuration ->
     if (vMatch) times.stopTimes[vehicleMatch] = time;
     else if (sMatch) times.transitTimes[stationMatch] = time;
-    else return false;
+    else throw runtime_error("invalid data\n");
 }
 
 bool Simulation::validOutput(const string &output) {
     return false;
 }
-//
-//Simulation::Simulation(const string &input, const string &conf, const string &out):g(), g_t(){
-//
-//}
+
 
 void Simulation::run() {
     cout << "Hello and welcome to Neverland's public transportation app." << endl;
@@ -119,72 +128,101 @@ void Simulation::run() {
         string user_choice;
         cout << main_screen;
         cin >> user_choice;
-        // TODO check user_choice
-        switch (choices[user_choice]) {
-            case 0: {
-                string path;
-                cout << "Enter a file path: ";
-                cin >> path;
-                validInput(path);
-                load(path); // TODO maybe will get a fstream from valid()
-                break;
+
+        try {
+            switch (choices[user_choice]) {
+                case 0: {
+                    string path;
+                    int vType;
+                    fstream file;
+                    cout << "Enter a file path: ";
+                    cin >> path;
+                    vType = validFileName(path);
+                    if (vType < 0) {
+                        throw SimulationException((string &) "Invalid file name, try again");
+                        break;
+                    }
+                    validFile(path, file);
+                    getInput(file, static_cast<VehicleTypes>(vType));
+                    break;
+                }
+                case 1: {
+                    string from;
+                    cout << "Enter source station name: ";
+                    cin >> from;
+                    if (!g.findVertex(from)) {
+                        from += " didn't found";
+                        throw SimulationException(from);
+                    }
+                    inOutbound(from, g, outMessage);
+                    break;
+                }
+                case 2: {
+                    string to;
+                    cout << "Enter destination station name: ";
+                    cin >> to;
+                    if (!g.findVertex(to)) {
+                        to += " didn't found";
+                        throw SimulationException(to);
+                    }
+                    inOutbound(to, g_t, inMessage);
+                    break;
+                }
+                case 3: {
+                    string from, to;
+                    cout << "Enter source station name: ";
+                    cin >> from;
+                    cout << "\nEnter destination station name: ";
+                    cin >> to;
+                    if (!g.findVertex(from)) {
+                        from += " didn't found";
+                        throw SimulationException(from);
+                    } else if (!g.findVertex(to)) {
+                        to += " didn't found";
+                        throw SimulationException(to);
+                    }
+                    shortestByCar(from, to);
+                    break;
+                }
+                case 4: {
+                    string from, to;
+                    cout << "Enter source station name: ";
+                    cin >> from;
+                    cout << "\nEnter destination station name: ";
+                    cin >> to;
+                    if (!g.findVertex(from)) {
+                        from += " didn't found";
+                        throw SimulationException(from);
+                    } else if (!g.findVertex(to)) {
+                        to += " didn't found";
+                        throw SimulationException(to);
+                    }
+                    shortest(from, to);
+                    break;
+                }
+                case 5: {
+                    print();
+                    break;
+                }
+                case 6: {
+                    cout << "Thank you, Goodbye";
+                    exit(0);
+                }
+                default:
+                    throw SimulationException((string &) "ERROR: INVALID INPUT,TRY AGAIN");
             }
-            case 1: {
-                string from;
-                cout << "Enter source station name: ";
-                cin >> from;
-                // TODO find if source in graph
-                inOutbound(from, g, outMessage);
-                break;
-            }
-            case 2: {
-                string to;
-                cout << "Enter destination station name: ";
-                cin >> to;
-                // TODO find if to in graph
-                inOutbound(to, g_t, inMessage);
-                break;
-            }
-            case 3: {
-                string from, to;
-                cout << "Enter source station name: ";
-                cin >> from;
-                cout << "\nEnter destination station name: ";
-                cin >> to;
-                // TODO find stations in graph
-                shortestByCar(from, to);
-                break;
-            }
-            case 4: {
-                string from, to;
-                cout << "Enter source station name: ";
-                cin >> from;
-                cout << "\nEnter destination station name: ";
-                cin >> to;
-                // TODO find stations in graph
-                shortest(from, to);
-                break;
-            }
-            case 5: {
-                print();
-                break;
-            }
-            case 6: {
-                cout << "Thank you, Goodbye";
-                exit(0);
-            }
-            default:
-                cout << "ERROR: INVALID INPUT,TRY AGAIN\n";
-                continue;
+        }
+        catch(SimulationException& e){
+            e.what();
         }
     }
-
 }
 
+//validate input file name
 int Simulation::validFileName(const string &file) {
     int equals = 0, counter = 0;
     int fileSize = file.size();
-    for (int i = 0; i < v_types_strings->size(); ++i) {
+    for (int i = 0; i < 4; ++i) {
         if (file[0] == v_types_strings[i][0]) {
             equals++;
             while (true) {
@@ -198,42 +236,90 @@ int Simulation::validFileName(const string &file) {
 }
 
 void Simulation::addEdge(const string &data, VehicleTypes vehicle) {
-    string line = data;
-    string from, to, cityOrDriveTime, sType;
-    StationTypes stationType;
-    stringstream toNum;
-    int driveTime, spaceCounter = 0;
-    line += " ";
-    for (int i = 0; i < line.size(); ++i) {
-        if (line[i] == ' ' || line[i] == '\t') {
+    string sType;
+    StationTypes fromStationType, toStationType;
+    validInput(data);
+    int spaceCounter = 0;
+    for (int i = 0; i < 2; ++i) {
             switch (spaceCounter) {
                 case 0:
-                    from = cityOrDriveTime;
-                    sType = cityOrDriveTime[0];
-                    sType += cityOrDriveTime[1];
-                    if (sType == "IC") stationType = intercity;
-                    else if (sType == "CS") stationType = central;
-                    else stationType = stad;
-                    cityOrDriveTime = "";
+                    sType = tempFrom[0];
+                    sType += tempFrom[1];
+                    if (sType == "IC") fromStationType = intercity;
+                    else if (sType == "CS") fromStationType = central;
+                    else fromStationType = stad;
+                    sType = "";
                     spaceCounter++;
                     break;
                 case 1:
-                    to = cityOrDriveTime;
-                    cityOrDriveTime = "";
+                    sType = tempTo[0];
+                    sType += tempTo[1];
+                    if (sType == "IC") toStationType = intercity;
+                    else if (sType == "CS") toStationType = central;
+                    else toStationType = stad;
+                    sType = "";
                     spaceCounter++;
                     break;
-                case 2:
-                    toNum << cityOrDriveTime;
-                    toNum >> driveTime;
-                    toNum.clear();
-                    break;
             }
-        } else {
-            cityOrDriveTime += line[i];
-        }
+
     }
-    g.addEdge(from, to, vehicle, stationType, driveTime);
-    g_t.addEdge(to, from, vehicle, stationType, driveTime);
+    g.addEdgeAlter(tempFrom, tempTo, vehicle, fromStationType, toStationType,  tempDriveTime);
+    g_t.addEdgeAlter(tempTo, tempFrom, vehicle, toStationType, fromStationType, tempDriveTime);
+}
+
+void Simulation::validFile(const string &fileName, fstream& file) {
+    file.open(fileName, ios_base::in);
+    if(!file.is_open()){
+        throw runtime_error(fileName + " is not open");
+    }
+}
+
+Simulation::Simulation(int argc, char **argv): output("output.dat"){
+    string currArg, line;
+    char flag = 'i';
+    int vType;
+    fstream file;
+    for(int i = 2; i < argc; i++){
+        currArg = argv[i];
+        if(currArg == "-o" || currArg == "-c"){
+            flag = currArg[1];
+        }
+        else{
+            switch (flag) {
+                case 'i':{
+                    vType = validFileName(currArg);
+                    if(vType < 0){ throw runtime_error("invalid file name"); }
+                    validFile(currArg,file);
+                    getInput(file,static_cast<VehicleTypes>(vType));
+                    file.close();
+                    break;
+                }
+                case 'c':{
+                    validFile(currArg, file);
+                    while(!file.eof()){
+                        getline(file,line);
+                        validConfiguration(line);
+                    }
+                    file.close();
+                    break;
+                }
+                case 'o':{
+                    validFile(currArg, file);
+                    output = currArg;
+                    file.close();
+                }
+            }
+        }
+
+    }
+}
+
+void Simulation::getInput(fstream &file, VehicleTypes vType) {
+    string line;
+    while(!file.eof()){
+        getline(file,line);
+        addEdge(line, vType);
+    }
 }
 
 
