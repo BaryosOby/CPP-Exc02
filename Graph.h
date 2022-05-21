@@ -1,42 +1,61 @@
 #ifndef EXC02_GRAPH_H
 #define EXC02_GRAPH_H
+
 #include "Edge.h"
 //#define TEST
 
 class Graph {
 private:
-    map< string, vector< vector< shared_ptr<Edge> > > > graph;
-    map<pair<string, VehicleTypes>, vector< shared_ptr<Edge> >> alter;
+    map<string, vector<vector<shared_ptr<Edge> > > > graph;
+    map<pair<string, VehicleTypes>, vector<shared_ptr<Edge> >> alter;
+    Times times;
 
     void initVertices(const string &from, StationTypes sType);
 
 public:
     Graph() = default;
-    Graph(const Graph& rhs) = default;
-    Graph(Graph&& rhs) noexcept;
-    Graph& operator=(const Graph& rhs);
-    Graph& operator=(Graph&& rhs) noexcept;
+
+    Graph(const Graph &rhs) = default;
+
+    Graph(Graph &&rhs, Times &times) noexcept;
+
+    Graph &operator=(const Graph &rhs);
+
+    Graph &operator=(Graph &&rhs) noexcept;
+
     ~Graph() = default;
 
     //TODO: exceptions if source not found
 
-    void addEdge(const string& from, const string& to, VehicleTypes vType, StationTypes sType, int drive);
-    void addEdgeAlter(const string& from, const string& to, VehicleTypes vType, StationTypes fromType, StationTypes toType, int drive);
-    void addVertex(const string& name);
-    void addVertex(const string& name, VehicleTypes vt);
+    void addEdge(const string &from, const string &to, VehicleTypes vType, StationTypes sType, int drive);
 
-    vector<string> BFSbyType(const string& from, VehicleTypes vType) const;
-    vector<string> BFSAlter(const string& from, VehicleTypes vType) const;
-    int DijByType(const string& from, const string& to, VehicleTypes vType) const;
-    int DijAlter(const string& from, const string& to, VehicleTypes vType) const;
-    int Dij(const string& from, const string& to) const;
-    int belFord(const string& from, const string& to);
+    void
+    addEdgeAlter(const string &from, const string &to, VehicleTypes vType, StationTypes fromType, StationTypes toType,
+                 int drive);
 
-    bool findVertex(const string& vName) const;
+    void addVertex(const string &name);
 
-    friend ostream& operator<<(ostream& out, const Graph& g);
+    void addVertex(const string &name, VehicleTypes vt);
+
+    void addTime(Times &t) { times = t; }
+
+    vector<string> BFSbyType(const string &from, VehicleTypes vType) const;
+
+    vector<string> BFSAlter(const string &from, VehicleTypes vType) const;
+
+    int DijByType(const string &from, const string &to, VehicleTypes vType) const;
+
+    int DijAlter(const string &from, const string &to, VehicleTypes vType) const;
+
+    int Dij(const string &from, const string &to) const;
+
+    int belFord(const string &from, const string &to);
+
+    bool findVertex(const string &vName) const;
+
+    friend ostream &operator<<(ostream &out, const Graph &g);
 };
 
-ostream& operator<<(ostream& out, const Graph& g);
+ostream &operator<<(ostream &out, const Graph &g);
 
 #endif

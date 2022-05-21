@@ -9,7 +9,7 @@ private:
     Graph g;
     Graph g_t; //g.transpose
     string output;
-
+    Times& times;
     string tempFrom;
     string tempTo;
     int tempDriveTime;
@@ -73,7 +73,7 @@ public:
         }
     };
 
-    Simulation(int argc, char** argv);
+    Simulation(int argc, char** argv,Times& timesRHS);
 
     // TODO big 5
     void run();

@@ -272,11 +272,26 @@ void Simulation::validFile(const string &fileName, fstream& file) {
     }
 }
 
-Simulation::Simulation(int argc, char **argv): output("output.dat"){
+Simulation::Simulation(int argc, char **argv,Times& times1): output("output.dat"),times(times1){
     string currArg, line;
     char flag = 'i';
     int vType;
     fstream file;
+    for (int i = 0; i < argc; ++i) {
+        currArg = argv[i];
+        if(currArg == "-c"){
+            currArg = argv[++i];
+            validFile(currArg, file);
+            while(!file.eof()){
+                getline(file,line);
+                validConfiguration(line);
+            }
+            file.close();
+            g.addTime(times);
+            g_t.addTime(times);
+            break;
+        }
+    }
     for(int i = 2; i < argc; i++){
         currArg = argv[i];
         if(currArg == "-o" || currArg == "-c"){
@@ -293,12 +308,15 @@ Simulation::Simulation(int argc, char **argv): output("output.dat"){
                     break;
                 }
                 case 'c':{
-                    validFile(currArg, file);
-                    while(!file.eof()){
-                        getline(file,line);
-                        validConfiguration(line);
-                    }
-                    file.close();
+//                    validFile(currArg, file);
+//                    while(!file.eof()){
+//                        getline(file,line);
+//                        validConfiguration(line);
+//                    }
+//                    file.close();
+//                    g.addTime(times);
+//                    g_t.addTime(times);
+
                     break;
                 }
                 case 'o':{
@@ -310,6 +328,7 @@ Simulation::Simulation(int argc, char **argv): output("output.dat"){
         }
 
     }
+
 }
 
 void Simulation::getInput(fstream &file, VehicleTypes vType) {
