@@ -32,6 +32,7 @@ struct Times {
     vector<int> stopTimes = {1, 2, 3, 5};
     vector<int> transitTimes = {15, 10, 5};
 //    Times(){
+
 //        transitTimes.insert(pair<StationTypes, int>(intercity, 15));
 //        transitTimes.insert(pair<StationTypes, int>(central, 10));
 //        transitTimes.insert(pair<StationTypes, int>(stad, 5));
