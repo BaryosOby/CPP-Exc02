@@ -143,9 +143,8 @@ int Graph::DijAlter(const string &from, const string &to, VehicleTypes vType) co
     }
     auto cmp = [discovered](string& left, string& right){ return discovered.at(left) > discovered.at(right); };
     priority_queue<string, vector<string>, decltype (cmp)> q(cmp);
-    for(const auto& v: alter){
-        q.push(v.first.first);
-    }
+    q.push(from);
+
     while(!q.empty()){
         auto curr = q.top();
         q.pop();
@@ -154,6 +153,7 @@ int Graph::DijAlter(const string &from, const string &to, VehicleTypes vType) co
                 auto dest = e->getDest();
                 if(discovered[dest] > discovered[curr] + e->getDriveTime() + e->getStopTime()){
                     discovered[dest] = discovered[curr] + e->getDriveTime() + e->getStopTime();
+                    q.push(dest);
                 }
             }
         }

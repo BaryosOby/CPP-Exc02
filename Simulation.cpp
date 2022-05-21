@@ -1,8 +1,5 @@
 #include "Simulation.h"
 
-//void Simulation::load(const string &input) {
-//
-//}
 
 void Simulation::inOutbound(const string &from, const Graph &gr, const string &message) const {
     for (int t = 0; t < 4; t++) {
@@ -128,9 +125,9 @@ void Simulation::run() {
         string user_choice;
         cout << main_screen;
         cin >> user_choice;
-
+        int choice = choices.find(user_choice) == choices.end()? -1 : choices[user_choice];
         try {
-            switch (choices[user_choice]) {
+            switch (choice) {
                 case 0: {
                     string path;
                     int vType;
@@ -139,7 +136,7 @@ void Simulation::run() {
                     cin >> path;
                     vType = validFileName(path);
                     if (vType < 0) {
-                        throw SimulationException((string &) "Invalid file name, try again");
+                        throw SimulationException("Invalid file name, try again");
                         break;
                     }
                     validFile(path, file);
@@ -209,7 +206,7 @@ void Simulation::run() {
                     exit(0);
                 }
                 default:
-                    throw SimulationException((string &) "ERROR: INVALID INPUT,TRY AGAIN");
+                    throw SimulationException("ERROR: INVALID INPUT,TRY AGAIN");
             }
         }
         catch(SimulationException& e){
@@ -233,6 +230,7 @@ int Simulation::validFileName(const string &file) {
             }
         }
     }
+    return -1;
 }
 
 void Simulation::addEdge(const string &data, VehicleTypes vehicle) {
@@ -270,7 +268,7 @@ void Simulation::addEdge(const string &data, VehicleTypes vehicle) {
 void Simulation::validFile(const string &fileName, fstream& file) {
     file.open(fileName, ios_base::in);
     if(!file.is_open()){
-        throw runtime_error(fileName + " is not open");
+        throw SimulationException(fileName + " is not open");
     }
 }
 

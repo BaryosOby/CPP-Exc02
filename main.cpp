@@ -12,6 +12,10 @@ int main(int argc, char *argv[]) {
         cerr << error.what();
         exit(0);
     }
+    catch (Simulation::SimulationException& exc) {
+        exc.what();
+        exit(0);
+    }
 
     return 0;
 }

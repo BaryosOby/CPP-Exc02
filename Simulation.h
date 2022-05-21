@@ -14,15 +14,6 @@ private:
     string tempTo;
     int tempDriveTime;
 
-    class SimulationException{
-        string error;
-    public:
-        explicit SimulationException(string& err): error(err){}
-        void what(){
-            cerr << error << endl;
-        }
-    };
-
     const string outMessage = "no outbound travel";
     const string inMessage = "no inbound travel";
     map<string, int> choices = {{"load",         0},
@@ -44,8 +35,6 @@ private:
                                "\t6. 'print' to print Neverland's roadmap to the output.\n"
                                "\t7. 'EXIT' to quit.\n";
 
-
-    // TODO exceptions of invalid input
 
     void load(const string &input);
 
@@ -74,11 +63,16 @@ private:
 
     void addEdge(const string& data,VehicleTypes vehicle); //adding edge from this class after validation as well to g_t
 
-    //TODO - print function, output validation,mixed dij,constructors(build graphs),add validation to run func,variadic arguments,
-    // potential adding exception classes, testing!
-
-
 public:
+    class SimulationException{
+        string error;
+    public:
+        explicit SimulationException(string err): error(err){}
+        void what(){
+            cerr << error << endl;
+        }
+    };
+
     Simulation(int argc, char** argv);
 
     // TODO big 5
