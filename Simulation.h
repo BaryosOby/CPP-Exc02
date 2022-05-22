@@ -47,17 +47,17 @@ private:
 
     void print() const;
 
-    bool validInput(const string &input);        //TODO throw exceptions
+    bool validInput(const string &input);
 
     void validConfiguration(string &conf);
 
-    bool validOutput(const string &output); // not sure what to do here
+//    bool validOutput(const string &output); // not sure what to do here
 
     int validFileName(const string &file); //added to check legal file name for vehicle info
 
     void validFile(const string& fileName, fstream& file);
 
-    bool validChoice(const string &input);
+//    bool validChoice(const string &input);
 
     void getInput(fstream& file, VehicleTypes vType);
 
@@ -74,11 +74,7 @@ public:
     };
 
     Simulation(int argc, char** argv,Times& timesRHS);
-
-    // TODO big 5
     void run();
-
-    Simulation() = default; // no needed
 };
 
 

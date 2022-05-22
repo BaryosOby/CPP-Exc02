@@ -1,22 +1,28 @@
 #ifndef EXC02_EDGE_H
 #define EXC02_EDGE_H
-
-
 #include "Times.h"
+/** Represents directed weighted edge in a graph (road in the simulation).
+ * an Edge is specified for a certain vehicle type.
+ *
+ * @class_member source, dest: names of head and tail vertices of the edge.
+ * @class_member vehicleType: type of vehicle that the edge is built for.
+ * @class_member driveTime: edge's weight.
+ * @class member times: holds a Times object, to calculate its stop time for the total weight.
+ *
+ * @Big_5: all default. no dynamic allocated memory.
+ * */
 
 class Edge {
 private:
     string source;
     string dest;
     VehicleTypes vehicleType;
-    StationTypes sourceStationType;
     int driveTime;
     Times &times;
 
 public:
-    Edge(const string &from, const string &to, VehicleTypes vType, StationTypes sType, int drive, Times &timesRHS)
-            : source(from),
-              dest(to), vehicleType(vType), sourceStationType(sType), driveTime(drive), times(timesRHS) {
+    Edge(const string &from, const string &to, VehicleTypes vType, int drive, Times &timesRHS)
+    : source(from), dest(to), vehicleType(vType), driveTime(drive), times(timesRHS) {
     }
 
     int getDriveTime() const {
@@ -25,10 +31,6 @@ public:
 
     int getStopTime() const {
         return times.stopTimes[vehicleType];
-    }
-
-    int getTransit() const {
-        return times.transitTimes[sourceStationType];
     }
 
     const string &getDest() const {

@@ -12,6 +12,10 @@
 #include <sstream>
 #include <limits>
 
+/** @enum_VehicleTypes: holds values of the vehicle types, which used as indexes for Times class.
+ * @enum_StationTypes: holds values of the station types, which used as indexes for Times class.
+ * */
+
 using namespace std;
 
 enum VehicleTypes {
@@ -20,28 +24,17 @@ enum VehicleTypes {
 enum StationTypes {
     intercity, central, stad
 };
-static int c = 0;
 static string v_types_strings[]{"bus", "tram", "sprinter", "rail"};
 static string s_types_strings[]{"intercity", "central", "stad"};
 static int inf = numeric_limits<int>::max() / 2;
 
+/** a class to hold stop and transit times, which can be modified at run-time.
+ * @Big_5 : all are default, no special usage.
+ * */
 
 struct Times {
-    //map<StationTypes, int> transitTimes;
-    //map<VehicleTypes, int> stopTimes;
     vector<int> stopTimes = {1, 2, 3, 5};
     vector<int> transitTimes = {15, 10, 5};
-//    Times(){
-
-//        transitTimes.insert(pair<StationTypes, int>(intercity, 15));
-//        transitTimes.insert(pair<StationTypes, int>(central, 10));
-//        transitTimes.insert(pair<StationTypes, int>(stad, 5));
-//
-//        stopTimes.insert(pair<VehicleTypes, int>(bus, 1));
-//        stopTimes.insert(pair<VehicleTypes, int>(tram, 2));
-//        stopTimes.insert(pair<VehicleTypes, int>(sprinter, 3));
-//        stopTimes.insert(pair<VehicleTypes, int>(rail, 5));
-//    }
 };
 
 

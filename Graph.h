@@ -4,10 +4,24 @@
 #include "Edge.h"
 //#define TEST
 
+/** Represents the roadmap.
+ * Every station contains 4 actual vertices that connected between each other by 'transit' edges, each one for a different vehicle type.
+ * a transit edge has a weight of (the station's transit time) - (its head's stop time).
+ * the purpose is to calculate the weight of a path, regarding the differences of the calculations that needed:
+ * stop time needs to be included, unless there is a transit within the station.
+ *
+ * a vertex is represented by a pair of its name and its Vehicle type.
+ * the graph is implemented as adjacency list, which is a vector of smart pointers of Edges.
+ *
+ * @class_member graph: a map from a vertex to its list.
+ * @class_member times: Times object to get the updated stop and transit times.
+ *
+ * @copy_constructor:
+ * */
+
 class Graph {
 private:
-    map<string, vector<vector<shared_ptr<Edge> > > > graph;
-    map<pair<string, VehicleTypes>, vector<shared_ptr<Edge> >> alter;
+    map<pair<string, VehicleTypes>, vector<shared_ptr<Edge> >> graph;
     Times times;
 
     void initVertices(const string &from, StationTypes sType);
@@ -25,29 +39,15 @@ public:
 
     ~Graph() = default;
 
-    //TODO: exceptions if source not found
-
-    void addEdge(const string &from, const string &to, VehicleTypes vType, StationTypes sType, int drive);
-
-    void
-    addEdgeAlter(const string &from, const string &to, VehicleTypes vType, StationTypes fromType, StationTypes toType,
-                 int drive);
-
-    void addVertex(const string &name);
+    void addEdge(const string &from, const string &to, VehicleTypes vType, StationTypes fromType, StationTypes toType, int drive);
 
     void addVertex(const string &name, VehicleTypes vt);
 
     void addTime(Times &t) { times = t; }
 
-    vector<string> BFSbyType(const string &from, VehicleTypes vType) const;
-
-    vector<string> BFSAlter(const string &from, VehicleTypes vType) const;
+    vector<string> BFSbytype(const string &from, VehicleTypes vType) const;
 
     int DijByType(const string &from, const string &to, VehicleTypes vType) const;
-
-    int DijAlter(const string &from, const string &to, VehicleTypes vType) const;
-
-    int Dij(const string &from, const string &to) const;
 
     int belFord(const string &from, const string &to);
 

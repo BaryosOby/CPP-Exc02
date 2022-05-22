@@ -1,7 +1,7 @@
 #include "Graph.h"
 #include <memory>
 
-Graph::Graph(Graph &&rhs, Times &times) noexcept: graph(move(rhs.graph)), times(times) {
+Graph::Graph(Graph &&rhs, Times &times) noexcept: graph(move(rhs.graph)), times(move(rhs.times)) {
     rhs.graph.clear();
 }
 
@@ -10,36 +10,17 @@ Graph &Graph::operator=(const Graph &rhs) {
         return *this;
     }
     graph = rhs.graph;
+    times = rhs.times;
     return *this;
 }
 
 Graph &Graph::operator=(Graph &&rhs) noexcept {
     graph = move(rhs.graph);
+    times = move(rhs.times);
     rhs.graph.clear();
     return *this;
 }
 
-//void Graph::addEdge(const string &from, const string &to, VehicleTypes vType, StationTypes sType, int drive) {
-//    if(graph.find(from) == graph.end()){
-//        addVertex(from);
-//    }
-//    if(graph.find(to) == graph.end()){
-//        addVertex(to);
-//    }
-//    for(const auto& e: graph[from][vType]){
-//        if (e->getDest() == to){
-//            e->setDriveTime(drive);
-//            return;
-//        }
-//    }
-//
-//    graph[from][vType].push_back(make_shared<Edge>(from, to, vType, sType, drive));
-//}
-
-//void Graph::addVertex(const string &name) {
-//    vector< vector< shared_ptr<Edge> > > v(4);
-//    graph.insert(pair<string, vector< vector< shared_ptr<Edge> > >>(name, v));
-//}
 
 void Graph::initVertices(const string &name, StationTypes sType) {
     for (int i = 0; i < 4; i++) {
@@ -51,49 +32,45 @@ void Graph::initVertices(const string &name, StationTypes sType) {
         int stop_i = times.stopTimes[idx];
         for (int j = 0; j < 4; j++) {
             auto jdx = static_cast<VehicleTypes>(j);
-            int stop_j = times.stopTimes[jdx];
+//            int stop_j = times.stopTimes[jdx];
             if (i == j) { continue; }
             else {
-                alter.at(make_pair(name, idx)).push_back(
-                        make_shared<Edge>(name, name, jdx, sType, transit - stop_i - stop_j, times));
+                graph.at(make_pair(name, idx)).push_back(
+                        make_shared<Edge>(name, name, jdx, sType, transit - stop_i, times));
             }
         }
     }
 }
 
-void Graph::addEdgeAlter(const string &from, const string &to, VehicleTypes vType, StationTypes fromType,
-                         StationTypes toType, int drive) {
+void Graph::addEdge(const string &from, const string &to, VehicleTypes vType, StationTypes fromType,
+                    StationTypes toType, int drive) {
 
     auto obj = make_pair(from, vType);
     // init station with all four vehicle types
-    if (alter.find(obj) == alter.end()) {
+    if (graph.find(obj) == graph.end()) {
         initVertices(from, fromType);
     }
 
-    if (alter.find(make_pair(to, vType)) == alter.end()) {
+    if (graph.find(make_pair(to, vType)) == graph.end()) {
         initVertices(to, toType);
     }
-
-//    for(alter.at(make_pair(from, vType)).)
-
-    for (const auto &e: alter.at(obj)) {
+    for (const auto &e: graph.at(obj)) {
         if (e->getDest() == to) {
             e->setDriveTime(drive);
             return;
         }
     }
 
-    alter.at(obj).push_back(make_shared<Edge>(from, to, vType, fromType, drive, times));
+    graph.at(obj).push_back(make_shared<Edge>(from, to, vType, fromType, drive, times));
 }
 
 void Graph::addVertex(const string &name, VehicleTypes vt) {
-    c++;
     vector<shared_ptr<Edge> > v;
     pair<string, VehicleTypes> p(name, vt);
-    alter.insert(pair<pair<string, VehicleTypes>, vector<shared_ptr<Edge> > >(p, v));
+    graph.insert(pair<pair<string, VehicleTypes>, vector<shared_ptr<Edge> > >(p, v));
 }
 
-vector<string> Graph::BFSAlter(const string &from, VehicleTypes vType) const {
+vector<string> Graph::BFSbytype(const string &from, VehicleTypes vType) const {
     vector<string> res;
     map<string, bool> discovered;
     queue<string> q;
@@ -102,7 +79,7 @@ vector<string> Graph::BFSAlter(const string &from, VehicleTypes vType) const {
     while (!q.empty()) {
         auto curr = q.front();
         q.pop();
-        for (const auto &e: alter.at(make_pair(curr, vType))) {
+        for (const auto &e: graph.at(make_pair(curr, vType))) {
             if (e->getDest() != curr) {
                 string dest = e->getDest();
                 if (discovered.find(dest) == discovered.end()) {
@@ -116,30 +93,10 @@ vector<string> Graph::BFSAlter(const string &from, VehicleTypes vType) const {
     return res;
 }
 
-//vector<string> Graph::BFSbyType(const string &from, VehicleTypes vType) const{
-//    vector<string> res;
-//    map<string, bool> discovered;
-//    queue<string> q;
-//    q.push(from);
-//    discovered.insert(pair<string, bool> (from, true));
-//    while(!q.empty()){
-//        auto curr = q.front();
-//        q.pop();
-//        for(const auto& e: graph.at(curr)[vType]){
-//            auto dest = e->getDest();
-//            if(discovered.find(dest) == discovered.end()){
-//                discovered.insert(pair<string, bool>(dest, true));
-//                q.push(dest);
-//                res.push_back(dest);
-//            }
-//        }
-//    }
-//    return res;
-//}
 
-int Graph::DijAlter(const string &from, const string &to, VehicleTypes vType) const {
+int Graph::DijByType(const string &from, const string &to, VehicleTypes vType) const {
     map<string, int> discovered;
-    for (const auto &v: alter) {
+    for (const auto &v: graph) {
         auto curr = v.first;
         if (curr.second == vType) {
             if (curr.first == from) { discovered.insert(pair<string, int>(curr.first, 0)); }
@@ -153,7 +110,7 @@ int Graph::DijAlter(const string &from, const string &to, VehicleTypes vType) co
     while (!q.empty()) {
         auto curr = q.top();
         q.pop();
-        for (const auto &e: alter.at(make_pair(curr, vType))) {
+        for (const auto &e: graph.at(make_pair(curr, vType))) {
             if (e->getDest() != curr) {
                 auto dest = e->getDest();
                 if (discovered[dest] > discovered[curr] + e->getDriveTime() + e->getStopTime()) {
@@ -167,30 +124,6 @@ int Graph::DijAlter(const string &from, const string &to, VehicleTypes vType) co
     return discovered[to] - times.stopTimes[vType];
 }
 
-//int Graph::DijByType(const string &from, const string &to, VehicleTypes vType) const{
-//    map<string, int> discovered;
-//    for(const auto& v: graph){
-//        auto curr = v.first;
-//        if(curr == from){ discovered.insert(pair<string, int>(curr, 0)); }
-//        else{ discovered.insert(pair<string, int>(curr, RAND_MAX)); }
-//    }
-//    auto cmp = [discovered](string& left, string& right){ return discovered.at(left) > discovered.at(right); };
-//    priority_queue<string, vector<string>, decltype (cmp)> q(cmp);
-//    for(const auto& v: graph){
-//        q.push(v.first);
-//    }
-//    while(!q.empty()){
-//        auto curr = q.top();
-//        q.pop();
-//        for(const auto& e: graph.at(curr)[vType]){
-//            auto dest = e->getDest();
-//            if(discovered[dest] > discovered[curr] + e->getDriveTime() + e->getStopTime()){
-//                discovered[dest] = discovered[curr] + e->getDriveTime() + e->getStopTime();
-//            }
-//        }
-//    }
-//    return discovered[to] - times.stopTimes[vType];
-//}
 
 
 int Graph::belFord(const string &from, const string &to) {
@@ -200,20 +133,18 @@ int Graph::belFord(const string &from, const string &to) {
     addVertex("temp dest", bus);
     for (int i = 0; i < 4; i++) {
         auto idx = static_cast<VehicleTypes>(i);
-        alter.at(source).push_back(make_shared<Edge>("temp source", from, idx, stad, -times.stopTimes[bus], times));
-        alter.at(make_pair(to, idx)).push_back(
-                make_shared<Edge>(to, "temp dest", bus, stad, -times.stopTimes[idx], times));
+        graph.at(source).push_back(make_shared<Edge>("temp source", from, idx, stad, -times.stopTimes[bus], times));
+        graph.at(make_pair(to, idx)).push_back(make_shared<Edge>(to, "temp dest", bus, stad, -times.stopTimes[idx], times));
     }
 
     map<pair<string, VehicleTypes>, int> weights;
     map<pair<string, VehicleTypes>, pair<string, VehicleTypes> > pi;
-    for (const auto &v : alter) {
+    for (const auto &v : graph) {
         weights.insert(make_pair(v.first, inf));
-        //pi.insert(make_pair(v.first, make_pair("", bus)));
     }
     weights.at(source) = 0;
     for (int i = 0; i < weights.size() - 1; i++) {
-        for (const auto &v : alter) {
+        for (const auto &v : graph) {
             auto stop = times.stopTimes[v.first.second];
             for (const auto &e: v.second) {
                 auto curr_neighbour = make_pair(e->getDest(), e->getVtype());
@@ -222,7 +153,9 @@ int Graph::belFord(const string &from, const string &to) {
                     if(pi.find(curr_neighbour) == pi.end()){
                         pi.insert(make_pair(curr_neighbour,v.first));
                     }
-                    pi.at(curr_neighbour) = v.first;
+                    else{
+                        pi.at(curr_neighbour) = v.first;
+                    }
 
                 }
             }
@@ -242,72 +175,20 @@ int Graph::belFord(const string &from, const string &to) {
 #endif
     int result = weights.at(dest) - times.stopTimes[origin.second];
 
-    alter.erase(source);
-    alter.erase(dest);
+    graph.erase(source);
+    graph.erase(dest);
     for (int i = 0; i < 4; i++) {
         auto idx = static_cast<VehicleTypes>(i);
-        alter.at(make_pair(to, idx)).pop_back();
+        graph.at(make_pair(to, idx)).pop_back();
     }
 
     return result;
 }
 
-//int Graph::Dij(const string &from, const string &to) const{
-//    map<string, int> discovered;
-//    for(const auto& v: graph){
-//        auto curr = v.first;
-//        if(curr == from){ discovered.insert(pair<string, int>(curr, 0)); }
-//        else{ discovered.insert(pair<string, int>(curr, RAND_MAX)); }
-//    }
-//    auto cmp = [discovered](string& left, string& right){ return discovered.at(left) > discovered.at(right); };
-//    priority_queue<string, vector<string>, decltype (cmp)> q(cmp);
-//    for(const auto& v: graph){
-//        q.push(v.first);
-//    }
-//    VehicleTypes startVehicle = bus;
-//    VehicleTypes currType = bus;
-//    while(!q.empty()){
-//        auto curr = q.top();
-//        q.pop();
-//        for(const auto& vehicle: graph.at(curr)){
-//            for(const auto& e: vehicle){
-//                auto dest = e->getDest();
-//                if(curr == from){
-//                    currType = e->getVtype();
-//                    if(discovered[dest] > discovered[curr] + e->getDriveTime()){
-//                        discovered[dest] = discovered[curr] + e->getDriveTime();
-//                        if(curr == from){
-//                            startVehicle = e->getVtype();
-//                        }
-//                    }
-//                }
-//                else if(e->getVtype() == currType && curr != from){
-//                    if(discovered[dest] > discovered[curr] + e->getDriveTime() + e->getStopTime()){
-//                        discovered[dest] = discovered[curr] + e->getDriveTime() + e->getStopTime();
-//                        if(curr == from){
-//                            startVehicle = e->getVtype();
-//                        }
-//                    }
-//                }
-//                else{
-//                    if(discovered[dest] > discovered[curr] + e->getDriveTime() + e->getTransit()){
-//                        discovered[dest] = discovered[curr] + e->getDriveTime() + e->getTransit();
-//                        currType = e->getVtype();
-//                    }
-//                }
-//
-//            }
-//        }
-//        if(curr == from){
-//            currType = startVehicle;
-//        }
-//    }
-//    return discovered[to];
-//}
 
 ostream &operator<<(ostream &out, const Graph &g) {
     out << "Neverland's roadmap:" << endl;
-    for (const auto &v : g.alter) {
+    for (const auto &v : g.graph) {
         string from = v.first.first;
         if (v.second.size() > 3) {
             out << "from " << from << " by " << v_types_strings[v.first.second] << " to:" << endl;
@@ -323,7 +204,7 @@ ostream &operator<<(ostream &out, const Graph &g) {
 }
 
 bool Graph::findVertex(const string &vName) const {
-    return alter.find(make_pair(vName, bus)) != alter.end();
+    return graph.find(make_pair(vName, bus)) != graph.end();
 }
 
 

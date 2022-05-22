@@ -3,7 +3,7 @@
 
 void Simulation::inOutbound(const string &from, const Graph &gr, const string &message) const {
     for (int t = 0; t < 4; t++) {
-        auto v = gr.BFSAlter(from, static_cast <VehicleTypes>(t));
+        auto v = gr.BFSbytype(from, static_cast <VehicleTypes>(t));
         cout << v_types_strings[t] << ": ";
         if (v.empty()) {
             cout << message;
@@ -16,7 +16,7 @@ void Simulation::inOutbound(const string &from, const Graph &gr, const string &m
 
 void Simulation::shortestByCar(const string &from, const string &to) const {
     for (int t = 0; t < 4; t++) {
-        int v = g.DijAlter(from, to, static_cast <VehicleTypes>(t));
+        int v = g.DijByType(from, to, static_cast <VehicleTypes>(t));
         cout << v_types_strings[t] << ": ";
         if (v < inf) {
             cout << v << endl;
@@ -49,7 +49,7 @@ bool Simulation::validInput(const string &input) {
     stringstream toNum;
     int driveTime;
     line += " ";
-    for (int i = 0; i < line.size(); ++i) {
+    for(int i = 0; i < line.size(); ++i) {
         if (line[i] == ' ' || line[i] == '\t') {
             if (cityOrDriveTime.size() > 32) throw runtime_error("City name to long!\n");
             spaceCounter++;
@@ -82,7 +82,7 @@ void Simulation::validConfiguration(string &conf) {
     VehicleTypes vehicleMatch;
     StationTypes stationMatch;
     conf += " ";
-    for (int i = 0; i < conf.size(); ++i) {
+    for(int i = 0; i < conf.size(); ++i) {
         if (conf[i] == ' ' || conf[i] == '\t') {
             spaceCounter++;
             if (spaceCounter > 1) break; // means its a number
@@ -114,10 +114,6 @@ void Simulation::validConfiguration(string &conf) {
     else throw runtime_error("invalid data\n");
 }
 
-bool Simulation::validOutput(const string &output) {
-    return false;
-}
-
 
 void Simulation::run() {
     cout << "Hello and welcome to Neverland's public transportation app." << endl;
@@ -137,7 +133,6 @@ void Simulation::run() {
                     vType = validFileName(path);
                     if (vType < 0) {
                         throw SimulationException("Invalid file name, try again");
-                        break;
                     }
                     validFile(path, file);
                     getInput(file, static_cast<VehicleTypes>(vType));
@@ -261,8 +256,8 @@ void Simulation::addEdge(const string &data, VehicleTypes vehicle) {
             }
 
     }
-    g.addEdgeAlter(tempFrom, tempTo, vehicle, fromStationType, toStationType,  tempDriveTime);
-    g_t.addEdgeAlter(tempTo, tempFrom, vehicle, toStationType, fromStationType, tempDriveTime);
+    g.addEdge(tempFrom, tempTo, vehicle, fromStationType, toStationType, tempDriveTime);
+    g_t.addEdge(tempTo, tempFrom, vehicle, toStationType, fromStationType, tempDriveTime);
 }
 
 void Simulation::validFile(const string &fileName, fstream& file) {
@@ -272,7 +267,7 @@ void Simulation::validFile(const string &fileName, fstream& file) {
     }
 }
 
-Simulation::Simulation(int argc, char **argv,Times& times1): output("output.dat"),times(times1){
+Simulation::Simulation(int argc, char **argv,Times& times1): output("output.dat"), times(times1), tempDriveTime(0){
     string currArg, line;
     char flag = 'i';
     int vType;
@@ -305,18 +300,6 @@ Simulation::Simulation(int argc, char **argv,Times& times1): output("output.dat"
                     validFile(currArg,file);
                     getInput(file,static_cast<VehicleTypes>(vType));
                     file.close();
-                    break;
-                }
-                case 'c':{
-//                    validFile(currArg, file);
-//                    while(!file.eof()){
-//                        getline(file,line);
-//                        validConfiguration(line);
-//                    }
-//                    file.close();
-//                    g.addTime(times);
-//                    g_t.addTime(times);
-
                     break;
                 }
                 case 'o':{
