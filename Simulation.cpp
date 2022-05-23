@@ -119,18 +119,23 @@ void Simulation::validConfiguration(string &conf) {
 void Simulation::run() {
     cout << "Hello and welcome to Neverland's public transportation app." << endl;
     while (true) {
+
         string user_choice;
         cout << main_screen;
-        cin >> user_choice;
-        int choice = choices.find(user_choice) == choices.end() ? -1 : choices[user_choice];
+        getline(cin,user_choice);
+        user_choice += " ";
+        vector<string> input = move(split(user_choice));
+        if(input.size() < 1) throw SimulationException("Missing arguments, try again");
+        int choice = choices.find(input[0]) == choices.end() ? -1 : choices[input[0]];
         try {
             switch (choice) {
                 case 0: {
-                    string path;
+                    if(input.size() < 2) throw SimulationException("Missing arguments, try again");
+                    string path = input[1];
                     int vType;
                     fstream file;
-                    cout << "Enter a file path: ";
-                    cin >> path;
+                    //cout << "Enter a file path: ";
+                    //cin >> path;
                     vType = validFileName(path);
                     if (vType < 0) {
                         throw SimulationException("Invalid file name, try again");
@@ -140,9 +145,10 @@ void Simulation::run() {
                     break;
                 }
                 case 1: {
-                    string from;
-                    cout << "Enter source station name: ";
-                    cin >> from;
+                    if(input.size() < 2) throw SimulationException("Missing arguments, try again");
+                    string from = input[1];
+                    //cout << "Enter source station name: ";
+                    //cin >> from;
                     if (!g.findVertex(from)) {
                         from += " didn't found";
                         throw SimulationException(from);
@@ -151,9 +157,10 @@ void Simulation::run() {
                     break;
                 }
                 case 2: {
-                    string to;
-                    cout << "Enter destination station name: ";
-                    cin >> to;
+                    if(input.size() < 2) throw SimulationException("Missing arguments, try again");
+                    string to = input[1];
+                    //cout << "Enter destination station name: ";
+                    //cin >> to;
                     if (!g.findVertex(to)) {
                         to += " didn't found";
                         throw SimulationException(to);
@@ -162,11 +169,12 @@ void Simulation::run() {
                     break;
                 }
                 case 3: {
-                    string from, to;
-                    cout << "Enter source station name: ";
-                    cin >> from;
-                    cout << "\nEnter destination station name: ";
-                    cin >> to;
+                    if(input.size() < 3) throw SimulationException("Missing arguments, try again");
+                    string from = input[1], to = input[2];
+                    //cout << "Enter source station name: ";
+                    //cin >> from;
+                    //cout << "\nEnter destination station name: ";
+                    //cin >> to;
                     if (!g.findVertex(from)) {
                         from += " didn't found";
                         throw SimulationException(from);
@@ -178,11 +186,12 @@ void Simulation::run() {
                     break;
                 }
                 case 4: {
-                    string from, to;
-                    cout << "Enter source station name: ";
-                    cin >> from;
-                    cout << "\nEnter destination station name: ";
-                    cin >> to;
+                    if(input.size() < 3) throw SimulationException("Missing arguments, try again");
+                    string from = input[1], to = input[2];
+                  //  cout << "Enter source station name: ";
+                   // cin >> from;
+                    //cout << "\nEnter destination station name: ";
+                    //cin >> to;
                     if (!g.findVertex(from)) {
                         from += " didn't found";
                         throw SimulationException(from);
@@ -323,6 +332,17 @@ void Simulation::getInput(fstream &file, VehicleTypes vType) {
         getline(file, line);
         addEdge(line, vType);
     }
+}
+
+vector<string> Simulation::split(string &text) {
+    vector<string> words{};
+    string space_delimiter = " ";
+    size_t pos = 0;
+    while ((pos = text.find(space_delimiter)) != string::npos) {
+        words.push_back(text.substr(0, pos));
+        text.erase(0, pos + space_delimiter.length());
+    }
+    return words;
 }
 
 
