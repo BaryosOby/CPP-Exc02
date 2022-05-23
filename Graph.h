@@ -16,7 +16,11 @@
  * @class_member graph: a map from a vertex to its list.
  * @class_member times: Times object to get the updated stop and transit times.
  *
- * @copy_constructor:
+ * @copy_constructor: default. no dynamic allocated memory.
+ * @copy_operator=: gets rhs's map and times.
+ * @destructor: default. same reason as copy c'tor.
+ * @move_constructor: moving the rhs's map, and clears it in the rhs's side.
+ * @move operator=: same as the c'tor.
  * */
 
 class Graph {

@@ -1,5 +1,22 @@
 #include "Simulation.h"
 
+void Simulation::outboundFunc(const string &from) const {
+    if (!g.findVertex(from)) {
+        string msg = from;
+        msg += " didn't found";
+        throw SimulationException(msg);
+    }
+    inOutbound(from, g, outMessage);
+}
+
+void Simulation::inboundFunc(const string &to) const {
+    if (!g.findVertex(to)) {
+        string msg = to;
+        msg += " didn't found";
+        throw SimulationException(msg);
+    }
+    inOutbound(to, g_t, inMessage);
+}
 
 void Simulation::inOutbound(const string &from, const Graph &gr, const string &message) const {
     for (int t = 0; t < 4; t++) {
@@ -14,7 +31,14 @@ void Simulation::inOutbound(const string &from, const Graph &gr, const string &m
 }
 
 
-void Simulation::shortestByCar(const string &from, const string &to) const {
+void Simulation::shortestByCar(string &from, string &to) const {
+    if (!g.findVertex(from)) {
+        from += " didn't found";
+        throw SimulationException(from);
+    } else if (!g.findVertex(to)) {
+        to += " didn't found";
+        throw SimulationException(to);
+    }
     for (int t = 0; t < 4; t++) {
         int v = g.DijByType(from, to, static_cast <VehicleTypes>(t));
         cout << v_types_strings[t] << ": ";
@@ -26,7 +50,14 @@ void Simulation::shortestByCar(const string &from, const string &to) const {
     }
 }
 
-void Simulation::shortest(const string &from, const string &to) {
+void Simulation::shortest(string &from, string &to) {
+    if (!g.findVertex(from)) {
+        from += " didn't found";
+        throw SimulationException(from);
+    } else if (!g.findVertex(to)) {
+        to += " didn't found";
+        throw SimulationException(to);
+    }
     int v = g.belFord(from, to);
     if (v < inf) {
         cout << "shortest time from " << from << " to " << to << ": " << v << endl;
@@ -119,7 +150,6 @@ void Simulation::validConfiguration(string &conf) {
 void Simulation::run() {
     cout << "Hello and welcome to Neverland's public transportation app." << endl;
     while (true) {
-
         string user_choice;
         cout << main_screen;
         getline(cin,user_choice);
@@ -131,75 +161,27 @@ void Simulation::run() {
             switch (choice) {
                 case 0: {
                     if(input.size() < 2) throw SimulationException("Missing arguments, try again");
-                    string path = input[1];
-                    int vType;
-                    fstream file;
-                    //cout << "Enter a file path: ";
-                    //cin >> path;
-                    vType = validFileName(path);
-                    if (vType < 0) {
-                        throw SimulationException("Invalid file name, try again");
-                    }
-                    validFile(path, file);
-                    getInput(file, static_cast<VehicleTypes>(vType));
+                    load(input[1]);
                     break;
                 }
                 case 1: {
                     if(input.size() < 2) throw SimulationException("Missing arguments, try again");
-                    string from = input[1];
-                    //cout << "Enter source station name: ";
-                    //cin >> from;
-                    if (!g.findVertex(from)) {
-                        from += " didn't found";
-                        throw SimulationException(from);
-                    }
-                    inOutbound(from, g, outMessage);
+                    outboundFunc(input[1]);
                     break;
                 }
                 case 2: {
                     if(input.size() < 2) throw SimulationException("Missing arguments, try again");
-                    string to = input[1];
-                    //cout << "Enter destination station name: ";
-                    //cin >> to;
-                    if (!g.findVertex(to)) {
-                        to += " didn't found";
-                        throw SimulationException(to);
-                    }
-                    inOutbound(to, g_t, inMessage);
+                    inboundFunc(input[1]);
                     break;
                 }
                 case 3: {
                     if(input.size() < 3) throw SimulationException("Missing arguments, try again");
-                    string from = input[1], to = input[2];
-                    //cout << "Enter source station name: ";
-                    //cin >> from;
-                    //cout << "\nEnter destination station name: ";
-                    //cin >> to;
-                    if (!g.findVertex(from)) {
-                        from += " didn't found";
-                        throw SimulationException(from);
-                    } else if (!g.findVertex(to)) {
-                        to += " didn't found";
-                        throw SimulationException(to);
-                    }
-                    shortestByCar(from, to);
+                    shortestByCar(input[1], input[2]);
                     break;
                 }
                 case 4: {
                     if(input.size() < 3) throw SimulationException("Missing arguments, try again");
-                    string from = input[1], to = input[2];
-                  //  cout << "Enter source station name: ";
-                   // cin >> from;
-                    //cout << "\nEnter destination station name: ";
-                    //cin >> to;
-                    if (!g.findVertex(from)) {
-                        from += " didn't found";
-                        throw SimulationException(from);
-                    } else if (!g.findVertex(to)) {
-                        to += " didn't found";
-                        throw SimulationException(to);
-                    }
-                    shortest(from, to);
+                    shortest(input[1], input[2]);
                     break;
                 }
                 case 5: {
@@ -343,6 +325,17 @@ vector<string> Simulation::split(string &text) {
         text.erase(0, pos + space_delimiter.length());
     }
     return words;
+}
+
+void Simulation::load(const string &path) {
+    int vType;
+    fstream file;
+    vType = validFileName(path);
+    if (vType < 0) {
+        throw SimulationException("Invalid file name, try again");
+    }
+    validFile(path, file);
+    getInput(file, static_cast<VehicleTypes>(vType));
 }
 
 

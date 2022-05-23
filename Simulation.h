@@ -3,13 +3,28 @@
 
 #include "Graph.h"
 
-
+/** Runs the program.
+ * responsible for input validation.
+ *
+ * holds two Graphs: g and its transpose. when adding an edge and vertex, both are updated.
+ *
+ * @class_member g: a graph of the city's roadmap.
+ * @class_member g_t: g transpose. g with its edges directed the other way. used for the 'inbound' query.
+ * @class_member output: name of the output file. default inits to "output.dat".
+ * @class_member times: a Times object that holds the updated stop and transit times.
+ * @class_member tempFrom, tempTo. tempDriveTime: used for the edge adding process.
+ *
+ * @Big_5: copy and move constructors and operators= are deleted. a Simulation object isn't purposed to be copied or move.
+ *         destructor is default - no dynamic allocated memory.
+ * */
 class Simulation {
 private:
     Graph g;
-    Graph g_t; //g.transpose
+    Graph g_t;
     string output;
     Times& times;
+
+
     string tempFrom;
     string tempTo;
     int tempDriveTime;
@@ -36,14 +51,19 @@ private:
                                "\t7. 'EXIT' to quit.\n";
 
 
-    void load(const string &input);
+    vector<string> split(string& text);
 
-    // bfs on g
-    void inOutbound(const string &from, const Graph &gr, const string &message) const;  // TODO throw exceptions
+    void load(const string& path);
 
-    void shortestByCar(const string &from, const string &to) const;
+    void outboundFunc(const string& from) const;
 
-    void shortest(const string &from, const string &to);
+    void inboundFunc(const string& to) const;
+
+    void inOutbound(const string &from, const Graph &gr, const string &message) const;
+
+    void shortestByCar(string &from, string &to) const;
+
+    void shortest(string &from, string &to);
 
     void print() const;
 
@@ -51,13 +71,9 @@ private:
 
     void validConfiguration(string &conf);
 
-//    bool validOutput(const string &output); // not sure what to do here
-
     int validFileName(const string &file); //added to check legal file name for vehicle info
 
     void validFile(const string& fileName, fstream& file);
-
-//    bool validChoice(const string &input);
 
     void getInput(fstream& file, VehicleTypes vType);
 
@@ -74,6 +90,11 @@ public:
     };
 
     Simulation(int argc, char** argv,Times& timesRHS);
+    Simulation(Simulation& rhs) = delete;
+    Simulation(Simulation&& rhs) = delete;
+    Simulation& operator=(Simulation& rhs) = delete;
+    Simulation& operator=(Simulation&& rhs) = delete;
+    ~Simulation() = default;
     void run();
 };
 

@@ -36,7 +36,7 @@ void Graph::initVertices(const string &name, StationTypes sType) {
             if (i == j) { continue; }
             else {
                 graph.at(make_pair(name, idx)).push_back(
-                        make_shared<Edge>(name, name, jdx, sType, transit - stop_i, times));
+                        make_shared<Edge>(name, name, jdx, transit - stop_i, times));
             }
         }
     }
@@ -61,7 +61,7 @@ void Graph::addEdge(const string &from, const string &to, VehicleTypes vType, St
         }
     }
 
-    graph.at(obj).push_back(make_shared<Edge>(from, to, vType, fromType, drive, times));
+    graph.at(obj).push_back(make_shared<Edge>(from, to, vType, drive, times));
 }
 
 void Graph::addVertex(const string &name, VehicleTypes vt) {
@@ -133,8 +133,8 @@ int Graph::belFord(const string &from, const string &to) {
     addVertex("temp dest", bus);
     for (int i = 0; i < 4; i++) {
         auto idx = static_cast<VehicleTypes>(i);
-        graph.at(source).push_back(make_shared<Edge>("temp source", from, idx, stad, -times.stopTimes[bus], times));
-        graph.at(make_pair(to, idx)).push_back(make_shared<Edge>(to, "temp dest", bus, stad, -times.stopTimes[idx], times));
+        graph.at(source).push_back(make_shared<Edge>("temp source", from, idx, -times.stopTimes[bus], times));
+        graph.at(make_pair(to, idx)).push_back(make_shared<Edge>(to, "temp dest", bus, -times.stopTimes[idx], times));
     }
 
     map<pair<string, VehicleTypes>, int> weights;
